@@ -24,8 +24,8 @@ namespace Sufficit
         {
             var options = new JsonSerializerOptions()
             {
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-                UnknownTypeHandling = System.Text.Json.Serialization.JsonUnknownTypeHandling.JsonElement,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
                 AllowTrailingCommas = true,
                 WriteIndented = false,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -39,15 +39,11 @@ namespace Sufficit
 
         public class JsonStringTypeConverter : JsonConverter<Type>
         {
-            public override Type Read(
-                ref Utf8JsonReader reader,
-                Type _,
-                JsonSerializerOptions __) => Type.GetType(reader.GetString()!);
+            public override Type? Read(ref Utf8JsonReader reader, Type _, JsonSerializerOptions __) 
+                => Type.GetType(reader.GetString()!);
 
-            public override void Write(
-                Utf8JsonWriter writer,
-                Type type,
-                JsonSerializerOptions _) => writer.WriteStringValue(type.ToString());
+            public override void Write(Utf8JsonWriter writer, Type type, JsonSerializerOptions _) 
+                => writer.WriteStringValue(type.ToString());
         }
     }
 }
