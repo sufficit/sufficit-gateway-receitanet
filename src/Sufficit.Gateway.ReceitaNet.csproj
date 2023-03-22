@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
+	<PropertyGroup Label="Sufficit Targeting">
+		<TargetFrameworks>net7.0;netstandard2.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<LangVersion>8.0</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<RootNamespace>Sufficit.Gateway.ReceitaNet</RootNamespace>
+	</PropertyGroup>
+	
+    <PropertyGroup Label="Sufficit Versioning">
+        <VersionSuffix>1.$([System.DateTime]::UtcNow.ToString(yy)).$([System.DateTime]::UtcNow.ToString(MMdd)).$([System.DateTime]::UtcNow.ToString(HHmm))</VersionSuffix>
+        <AssemblyVersion Condition=" '$(VersionSuffix)' == '' ">1.0.0.0</AssemblyVersion>
+        <AssemblyVersion Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</AssemblyVersion>
+        <Version Condition=" '$(VersionSuffix)' == '' ">0.0.1.0</Version>
+        <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</Version>
+    </PropertyGroup>
+	
+	<PropertyGroup Label="Sufficit Product General">
+		<Company>SUFFICIT SOLUÇÕES EM TECNOLOGIA DA INFORMAÇÃO</Company>
+		<Authors>Hugo Castro de Deco</Authors>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<ProductName>ReceitaNet Providers API Client (by Sufficit)</ProductName>
+		<AssemblyName>Sufficit.Gateway.ReceitaNet</AssemblyName>
+
+		<!-- Copia todas as dlls de dependencias para o diretório de publicação dos projetos que o utilizam -->
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<PreserveCompilationReferences>false</PreserveCompilationReferences>
+
+		<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+	</PropertyGroup>
+	
+	<PropertyGroup Label="Sufficit Pacote NUGET">
+        <Name>Sufficit.Gateway.ReceitaNet</Name>
+        <PackageId>Sufficit.Gateway.ReceitaNet</PackageId>
+        <PackageDescription>ReceitaNet Providers API Client (by Sufficit)</PackageDescription>
+        <RepositoryUrl>https://github.com/sufficit/sufficit-gateway-receitanet</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/sufficit/sufficit-gateway-receitanet</PackageProjectUrl>
+		<PackageIconUrl>https://raw.githubusercontent.com/sufficit/sufficit-gateway-receitanet/main/icon.ico</PackageIconUrl>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  
+		<PackageLicenseFile>license</PackageLicenseFile>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
+		<PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+	
+	<ItemGroup>
+		<None Include="../icon.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="../license">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="../readme.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+		<PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
+	</ItemGroup>
+</Project>
