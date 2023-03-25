@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using static Sufficit.Json;
 
 namespace Sufficit.Gateway.ReceitaNet
 {
@@ -18,7 +19,8 @@ namespace Sufficit.Gateway.ReceitaNet
         /// <summary>
         /// (required)
         /// </summary>
+        [JsonConverter(typeof(DateConverter))]
         [JsonPropertyName("vencimento")]
-        public string Vencimento { get; set; } = default!;
+        public DateTime Vencimento { get; set; }
     }
 }

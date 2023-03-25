@@ -112,13 +112,10 @@ namespace Sufficit.Gateway.ReceitaNet
                 {
                     foreach (var item in Invoices)
                     {
-                        if (DateTime.TryParse(item.Vencimento, out DateTime Vencimento))
+                        if (item.Vencimento.ToUniversalTime() < DateTime.UtcNow.AddDays(-1))
                         {
-                            if (Vencimento.ToUniversalTime() < DateTime.UtcNow.AddDays(-1))
-                            {
-                                yield return item;
-                            }
-                        }
+                            yield return item;
+                        }                        
                     }
                 }
             }
