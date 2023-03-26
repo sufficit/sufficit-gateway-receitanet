@@ -35,10 +35,10 @@ namespace Sufficit.Gateway.ReceitaNet
         public string StatusDisplay { get; set; } = default!;
 
         /// <summary>
-        /// (required) status do cliente promessa de pagamneto excedido (0) ou não (1)
+        /// (required) has available release by promisse, exceded (false) or available (true)
         /// </summary>
         [JsonPropertyName("isPromessaPagamento")]
-        public bool Promessa { get; set; }
+        public bool Promisse { get; set; }
 
         /// <summary>
         /// (required) valor do último boleto não pago
@@ -50,7 +50,7 @@ namespace Sufficit.Gateway.ReceitaNet
         /// itens de faturamento (array of assets.ItemFatura)
         /// </summary>
         [JsonPropertyName("faturasEmAberto")]
-        public ICollection<InvoiceItem> Invoices { get; }
+        public ICollection<InvoiceItem> Invoices { get; set; }
 
         /// <summary>
         /// (required) cpf/cnpj do cliente
@@ -62,7 +62,7 @@ namespace Sufficit.Gateway.ReceitaNet
         /// contract status enum
         /// </summary>
         [JsonPropertyName("contratoStatus")]
-        public int Status { get; set; }
+        public ContractStatus Status { get; set; }
 
         /// <summary>
         /// existe chamado aberto para o cliente ?
@@ -112,7 +112,7 @@ namespace Sufficit.Gateway.ReceitaNet
                 {
                     foreach (var item in Invoices)
                     {
-                        if (item.Vencimento.ToUniversalTime() < DateTime.UtcNow.AddDays(-1))
+                        if (item.Expiration.ToUniversalTime() < DateTime.UtcNow.AddDays(-1))
                         {
                             yield return item;
                         }                        

@@ -14,13 +14,13 @@ namespace Sufficit.Gateway.ReceitaNet
         /// (required)
         /// </summary>
         [JsonPropertyName("valor")]
-        public decimal Valor { get; set; }
+        public decimal Value { get; set; }
 
         /// <summary>
         /// (required)
         /// </summary>
         [JsonConverter(typeof(DateConverter))]
         [JsonPropertyName("vencimento")]
-        public DateTime Vencimento { get; set; }
+        public DateTime Expiration { get; set; }
     }
 }
