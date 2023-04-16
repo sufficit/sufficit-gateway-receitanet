@@ -66,7 +66,7 @@ namespace Sufficit.Gateway.ReceitaNet
             return Request<ChargeResponse>(message, cancellationToken);
         }
 
-        public Task<ConnectionStatusResponse> GetConnectionStatus(ContractAndContactParameters parameters, string token, CancellationToken cancellationToken = default)
+        public async Task<ConnectionStatusResponse> GetConnectionStatus(ContractAndContactParameters parameters, string token, CancellationToken cancellationToken = default)
         {
             logger.LogTrace("get connection status by parameters: {parameters}", parameters);
 
@@ -77,7 +77,29 @@ namespace Sufficit.Gateway.ReceitaNet
             var uri = new Uri($"verificar-acesso?{query}", UriKind.Relative);
             var message = new HttpRequestMessage(HttpMethod.Post, uri);
             message.Content = JsonContent.Create(parameters, null, jsonOptions);
-            return Request<ConnectionStatusResponse>(message, cancellationToken);
+            try
+            {
+                return await Request<ConnectionStatusResponse>(message, cancellationToken);
+            } 
+            catch(HttpRequestException ex) 
+            {
+                int statuscode;
+#if NET5_0_OR_GREATER
+                statuscode = (int)ex.StatusCode.GetValueOrDefault();
+#else
+                statuscode = ex.Message.ToLowerInvariant().Contains("server error") ? 500 : -1;
+#endif
+                if (statuscode == 500)                
+                    logger.LogWarning(ex, "error on getting connection status, probably the client has no server configured at receitanet");                
+                else                
+                    logger.LogError(ex, "error ({code}) on getting connection status: {message}", statuscode, ex.Message);                    
+                
+                return new ConnectionStatusResponse()
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
         }
 
         /// <summary>
