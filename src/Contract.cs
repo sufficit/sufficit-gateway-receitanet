@@ -88,22 +88,26 @@ namespace Sufficit.Gateway.ReceitaNet
         [JsonPropertyName("isSMS")]
         public bool HasSMS { get; set; }
 
-
         [JsonPropertyName("tecnologia")]
         public int Technology { get; set; }
 
         [JsonPropertyName("servidor")]
         public ServerInfo Server { get; }
 
+        #region TRICKS
+
         /// <summary>
         /// Contract has any open or expired invoice
         /// </summary>
+        [JsonIgnore]
         public bool IsPending 
             => Invoices?.Any() ?? false;
 
+        [JsonIgnore]
         public bool HasExpired
             => Expired?.Any() ?? false;
 
+        [JsonIgnore]
         public IEnumerable<InvoiceItem> Expired
         {
             get
@@ -120,5 +124,7 @@ namespace Sufficit.Gateway.ReceitaNet
                 }
             }
         }
+
+        #endregion
     }
 }
