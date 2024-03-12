@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
 	<PropertyGroup Label="Sufficit Targeting">
-		<TargetFrameworks>net7.0;netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<LangVersion>8.0</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -61,12 +61,12 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.*" />
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.*" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.*" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="7.*" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.*" />
-		<PackageReference Include="System.Net.Http.Json" Version="7.*" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.*" />
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="[*,9.0.0)" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="[*,9.0.0)" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[*,9.0.0)" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="[*,9.0.0)" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[*,9.0.0)" />
+		<PackageReference Include="System.Net.Http.Json" Version="[*,9.0.0)" />
 	</ItemGroup>
 </Project>

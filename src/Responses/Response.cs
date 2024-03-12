@@ -20,5 +20,11 @@ namespace Sufficit.Gateway.ReceitaNet.Responses
         /// </summary>
         [JsonPropertyName("msg")]
         public string? Message { get; set; }
+
+        /// <summary>
+        ///     Internal exception control
+        /// </summary>
+        [JsonIgnore]
+        public Exception? Exception { get; set; }
     }
 }

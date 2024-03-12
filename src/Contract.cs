@@ -9,13 +9,6 @@ namespace Sufficit.Gateway.ReceitaNet
 {
     public class Contract
     {
-        public Contract() 
-        {
-            Tickets = new ContractTickets();
-            Server = new ServerInfo();
-            Invoices = new HashSet<InvoiceItem>();
-        }
-
         /// <summary>
         /// (required) código do cliente
         /// </summary>
@@ -50,7 +43,7 @@ namespace Sufficit.Gateway.ReceitaNet
         /// itens de faturamento (array of assets.ItemFatura)
         /// </summary>
         [JsonPropertyName("faturasEmAberto")]
-        public ICollection<InvoiceItem> Invoices { get; set; }
+        public ICollection<InvoiceItem> Invoices { get; set; } = default!;
 
         /// <summary>
         /// (required) cpf/cnpj do cliente
@@ -74,7 +67,7 @@ namespace Sufficit.Gateway.ReceitaNet
         /// status do cliente (Ativo, Suspenso)
         /// </summary>
         [JsonPropertyName("isChamados")]
-        public ContractTickets? Tickets { get; }
+        public ContractTickets Tickets { get; set; } = default!;
 
         /// <summary>
         /// cliente possui e-mail válido para envio de cobrança ?
@@ -89,10 +82,11 @@ namespace Sufficit.Gateway.ReceitaNet
         public bool HasSMS { get; set; }
 
         [JsonPropertyName("tecnologia")]
-        public int Technology { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Technology { get; set; }
 
         [JsonPropertyName("servidor")]
-        public ServerInfo Server { get; }
+        public ServerInfo Server { get; set; } = default!;
 
         #region TRICKS
 
@@ -101,7 +95,7 @@ namespace Sufficit.Gateway.ReceitaNet
         /// </summary>
         [JsonIgnore]
         public bool IsPending 
-            => Invoices?.Any() ?? false;
+            => Invoices?.Count > 0;
 
         [JsonIgnore]
         public bool HasExpired

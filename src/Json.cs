@@ -1,14 +1,11 @@
-﻿using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
-namespace Sufficit
+namespace Sufficit.Gateway.ReceitaNet
 {
     public static class Json
     {
@@ -35,32 +32,58 @@ namespace Sufficit
 
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, true));
             options.Converters.Add(new JsonStringTypeConverter());
+            //options.Converters.Add(new BoolToStringConverter());
             return options;
         }
 
-        public class JsonStringTypeConverter : JsonConverter<Type>
-        {
-            public override Type? Read(ref Utf8JsonReader reader, Type _, JsonSerializerOptions __) 
-                => Type.GetType(reader.GetString()!);
+        public const string DATETIMEFORMAT = "yyyy-MM-dd";    
+    }
 
-            public override void Write(Utf8JsonWriter writer, Type type, JsonSerializerOptions _) 
-                => writer.WriteStringValue(type.ToString());
+    public class JsonStringTypeConverter : JsonConverter<Type>
+    {
+        public override Type? Read(ref Utf8JsonReader reader, Type _, JsonSerializerOptions __)
+            => Type.GetType(reader.GetString()!);
+
+        public override void Write(Utf8JsonWriter writer, Type type, JsonSerializerOptions _)
+            => writer.WriteStringValue(type.ToString());
+    }
+
+    public class DateConverter : JsonConverter<DateTime>
+    {
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            Debug.Assert(typeToConvert == typeof(DateTime));
+            return DateTime.ParseExact(reader.GetString()!, Json.DATETIMEFORMAT, CultureInfo.InvariantCulture);
         }
 
-        public const string DATETIMEFORMAT = "yyyy-MM-dd";
-
-        public class DateConverter : JsonConverter<DateTime>
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
-            public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            {
-                Debug.Assert(typeToConvert == typeof(DateTime));
-                return DateTime.ParseExact(reader.GetString()!, DATETIMEFORMAT, CultureInfo.InvariantCulture);
-            }
+            writer.WriteStringValue(value.ToUniversalTime().ToString(Json.DATETIMEFORMAT));
+        }
+    }
 
-            public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+    public class BoolToStringConverter : JsonConverter<string?>
+    {
+        public override bool CanConvert(Type typeToConvert)
+        {
+            return typeToConvert == typeof(bool) || typeToConvert == typeof(string);
+        }
+
+        public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            switch (reader.TokenType)
             {
-                writer.WriteStringValue(value.ToUniversalTime().ToString(DATETIMEFORMAT));
+                case JsonTokenType.True:
+                case JsonTokenType.False:
+                    return null;                
+                default:
+                    return reader.GetString();
             }
+        }
+
+        public override void Write(Utf8JsonWriter writer, string? value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value);            
         }
     }
 }

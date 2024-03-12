@@ -18,7 +18,9 @@ namespace Sufficit.Gateway.ReceitaNet
         /// <summary>
         /// Message to client
         /// </summary>
+        [JsonConverter(typeof(BoolToStringConverter))]
         [JsonPropertyName("mensagemManutencao")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull | JsonIgnoreCondition.WhenWritingDefault)]
         public string? Message { get; set; }
     }
 }

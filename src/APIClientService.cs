@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace Sufficit.Gateway.ReceitaNet
         public APIClientService(IOptionsMonitor<GatewayOptions> ioptions, IHttpClientFactory clientFactory, ILogger<APIClientService> logger)
             : base(ioptions, clientFactory, logger, Json.Options)
         {     
-            logger.LogTrace($"Sufficit ReceitaNet Gateway API Client Service instantiated with base address: {options.BaseUrl}");
+            logger.LogTrace("Sufficit ReceitaNet Gateway API Client Service instantiated with base address: {baseurl}", options.BaseUrl);
         }
 
         public Task<ContractResponse> GetContract(GetContractParameters parameters, string token, CancellationToken cancellationToken = default)
@@ -80,24 +81,34 @@ namespace Sufficit.Gateway.ReceitaNet
             try
             {
                 return await Request<ConnectionStatusResponse>(message, cancellationToken);
-            } 
-            catch(HttpRequestException ex) 
+            }
+            catch (Exception ex) 
             {
-                int statuscode;
-#if NET5_0_OR_GREATER
-                statuscode = (int)ex.StatusCode.GetValueOrDefault();
-#else
-                statuscode = ex.Message.ToLowerInvariant().Contains("server error") ? 500 : -1;
-#endif
-                if (statuscode == 500)                
-                    logger.LogWarning(ex, "error on getting connection status, probably the client has no server configured at receitanet");                
-                else                
-                    logger.LogError(ex, "error ({code}) on getting connection status: {message}", statuscode, ex.Message);                    
-                
+                if (ex is HttpRequestException httpException)
+                {
+                    int statuscode;
+                    #if NET5_0_OR_GREATER
+                        statuscode = (int)httpException.StatusCode.GetValueOrDefault();
+                    #else
+                        statuscode = httpException.Message.ToLowerInvariant().Contains("server error") ? 500 : -1;
+                    #endif
+
+                    if (statuscode == 500)
+                    {
+                        ex = new MissingServerConfigurationException(parameters.ContractId, ex);
+                        logger.LogWarning(ex, "error on getting connection status, {message}", ex.Message);
+                    }
+                    else
+                    {
+                        logger.LogError(ex, "error ({code}) on getting connection status: {message}", statuscode, ex.Message);
+                    }
+                }
+
                 return new ConnectionStatusResponse()
                 {
                     Success = false,
-                    Message = ex.Message
+                    Message = ex.Message,
+                    Exception = ex
                 };
             }
         }

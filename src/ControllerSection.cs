@@ -67,6 +67,9 @@ namespace Sufficit.Gateway.ReceitaNet
             if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
                 return new T() { Success = false, Message = "no content" };
 
+            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                return new T() { Success = false, Message = "internal server error" };
+
             await response.EnsureSuccess();  
             var content = await response.Content.ReadFromJsonAsync<T>(jsonOptions, cancellationToken);            
             return content ?? new T() { Success = true, Message = "empty body" };
