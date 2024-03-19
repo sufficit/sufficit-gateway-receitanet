@@ -13,14 +13,6 @@ namespace Sufficit.Gateway.ReceitaNet.Parameters
         public string Reason { get; set; } = default!;
 
         [JsonPropertyName("ocorrenciatipo")]
-        public TicketKind Kind { get; set; }
-
-        public enum TicketKind
-        {
-            Maintenance = 1,
-            Installation = 2,
-            EquipmentRemoval = 4,
-            Financial = 5
-        }
+        public TicketEnum Kind { get; set; }
     }
 }

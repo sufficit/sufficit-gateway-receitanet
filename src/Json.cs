@@ -32,7 +32,6 @@ namespace Sufficit.Gateway.ReceitaNet
 
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, true));
             options.Converters.Add(new JsonStringTypeConverter());
-            //options.Converters.Add(new BoolToStringConverter());
             return options;
         }
 

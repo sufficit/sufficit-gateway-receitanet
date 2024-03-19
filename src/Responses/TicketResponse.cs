@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Sufficit.Gateway.ReceitaNet.Responses
 {
-    public class TicketResponse : ProtocolResponse
+    public class TicketResponse : ProtocolResponse, ITicketResponse
     {
         [JsonPropertyName("idSuporte")]
         public int TicketId { get; set; }
@@ -15,6 +15,5 @@ namespace Sufficit.Gateway.ReceitaNet.Responses
         /// </summary>
         [JsonPropertyName("status")]
         public bool Status { get; set; }
-
     }
 }

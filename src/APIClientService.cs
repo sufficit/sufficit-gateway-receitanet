@@ -3,13 +3,8 @@ using Microsoft.Extensions.Options;
 using Sufficit.Gateway.ReceitaNet.Parameters;
 using Sufficit.Gateway.ReceitaNet.Responses;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +22,10 @@ namespace Sufficit.Gateway.ReceitaNet
 
         public Task<ContractResponse> GetContract(GetContractParameters parameters, string token, CancellationToken cancellationToken = default)
         {
-            logger.LogTrace("get client by parameters: {parameters}", parameters);
+            logger.LogTrace("get client by contract: {contract}, document: {document}, phone: {phone}", 
+                parameters.ContractId, 
+                parameters.Document,
+                parameters.Phone);
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
@@ -41,7 +39,9 @@ namespace Sufficit.Gateway.ReceitaNet
 
         public Task<NotifyResponse> PaymentNotification(ContractAndContactParameters parameters, string token, CancellationToken cancellationToken = default)
         {
-            logger.LogTrace("payment notification by parameters: {parameters}", parameters);
+            logger.LogTrace("payment notification by contract: {contract}, contact: {contact}", 
+                parameters.ContractId, 
+                parameters.Contact);
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
@@ -55,7 +55,10 @@ namespace Sufficit.Gateway.ReceitaNet
 
         public Task<ChargeResponse> ChargeNotification(ChargeNotificationParameters parameters, string token, CancellationToken cancellationToken = default)
         {
-            logger.LogTrace("charge notification by parameters: {parameters}", parameters);
+            logger.LogTrace("charge notification by contract: {contract}, contact: {contact}, channel: {channel}", 
+                parameters.ContractId,
+                parameters.Contact,
+                parameters.Channel);
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
@@ -69,7 +72,9 @@ namespace Sufficit.Gateway.ReceitaNet
 
         public async Task<ConnectionStatusResponse> GetConnectionStatus(ContractAndContactParameters parameters, string token, CancellationToken cancellationToken = default)
         {
-            logger.LogTrace("get connection status by parameters: {parameters}", parameters);
+            logger.LogTrace("get connection status by contract: {contract}, contact: {contact}", 
+                parameters.ContractId, 
+                parameters.Contact);
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
@@ -118,7 +123,11 @@ namespace Sufficit.Gateway.ReceitaNet
         /// </summary>
         public Task<TicketResponse> Ticket(TicketParameters parameters, string token, CancellationToken cancellationToken = default)
         {
-            logger.LogTrace("open ticket by parameters: {parameters}", parameters);
+            logger.LogTrace("open ticket by contract: {contract}, contact: {contact}, kind: {kind}, reason: {reason}", 
+                parameters.ContractId,
+                parameters.Contact,
+                parameters.Kind,
+                parameters.Reason);
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
@@ -135,7 +144,11 @@ namespace Sufficit.Gateway.ReceitaNet
         /// </summary>
         public Task<RecordingResponse> Recording(RecordingParameters parameters, string token, CancellationToken cancellationToken = default)
         {
-            logger.LogTrace("update ticket recording by parameters: {parameters}", parameters);
+            logger.LogTrace("update ticket recording by ticket: {ticket}, extension: {extension}, recording: {recording}, finalize: {finalize}", 
+                parameters.TicketId,
+                parameters.Extension,
+                parameters.Recording,
+                parameters.Finalize);
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
