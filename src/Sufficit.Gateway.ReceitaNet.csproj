@@ -7,14 +7,14 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>Sufficit.Gateway.ReceitaNet</RootNamespace>
 	</PropertyGroup>
-	
-    <PropertyGroup Label="Sufficit Versioning">
-        <VersionSuffix>1.$([System.DateTime]::UtcNow.ToString(yy)).$([System.DateTime]::UtcNow.ToString(MMdd)).$([System.DateTime]::UtcNow.ToString(HHmm))</VersionSuffix>
-        <AssemblyVersion Condition=" '$(VersionSuffix)' == '' ">1.0.0.0</AssemblyVersion>
-        <AssemblyVersion Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</AssemblyVersion>
-        <Version Condition=" '$(VersionSuffix)' == '' ">0.0.1.0</Version>
-        <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</Version>
-    </PropertyGroup>
+
+	<PropertyGroup Label="Sufficit Versioning">
+		<VersionSuffix Condition=" '$(Configuration)' != 'Debug' ">1.$([System.DateTime]::UtcNow.ToString(yy)).$([System.DateTime]::UtcNow.ToString(MMdd)).$([System.DateTime]::UtcNow.ToString(HHmm))</VersionSuffix>
+		<AssemblyVersion Condition=" '$(VersionSuffix)' == '' ">0.0.0.0</AssemblyVersion>
+		<AssemblyVersion Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</AssemblyVersion>
+		<Version Condition=" '$(VersionSuffix)' == '' ">0.0.0.0</Version>
+		<Version Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</Version>
+	</PropertyGroup>
 	
 	<PropertyGroup Label="Sufficit Product General">
 		<Company>SUFFICIT SOLUÇÕES EM TECNOLOGIA DA INFORMAÇÃO</Company>
@@ -58,15 +58,40 @@
 			<PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
-
-
+	
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.*" />
-		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="[*,9.0.0)" />
+	</ItemGroup>
+	
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="[3.*,4.0.0)" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="[9.*,10.0.0)" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="[8.*,9.0.0)" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="[7.*,8.0.0)" />
+	</ItemGroup>
+	
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="[*,9.0.0)" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[*,9.0.0)" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="[*,9.0.0)" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[*,9.0.0)" />
 		<PackageReference Include="System.Net.Http.Json" Version="[*,9.0.0)" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net8.0' Or '$(TargetFramework)' == 'net9.0' ">
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="[*,10.0.0)" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[*,10.0.0)" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="[*,10.0.0)" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[*,10.0.0)" />
+		<PackageReference Include="System.Net.Http.Json" Version="[*,10.0.0)" />
 	</ItemGroup>
 </Project>
