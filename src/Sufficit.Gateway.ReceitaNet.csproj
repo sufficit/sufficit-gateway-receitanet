@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
 	<PropertyGroup Label="Sufficit Targeting">
-		<TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net7.0;net9.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<LangVersion>8.0</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -58,40 +58,22 @@
 			<PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
+		<PkgVersion>[*,9.0.0)</PkgVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(PkgVersion)' == '' ">
+		<PkgVersion>[*,10.0.0)</PkgVersion>
+	</PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.*" />
-	</ItemGroup>
-	
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="[3.*,4.0.0)" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
-		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="[9.*,10.0.0)" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
-		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="[8.*,9.0.0)" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
-		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="[7.*,8.0.0)" />
-	</ItemGroup>
-	
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="[*,9.0.0)" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[*,9.0.0)" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="[*,9.0.0)" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[*,9.0.0)" />
-		<PackageReference Include="System.Net.Http.Json" Version="[*,9.0.0)" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net8.0' Or '$(TargetFramework)' == 'net9.0' ">
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="[*,10.0.0)" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[*,10.0.0)" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="[*,10.0.0)" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[*,10.0.0)" />
-		<PackageReference Include="System.Net.Http.Json" Version="[*,10.0.0)" />
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="$(PkgVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="$(PkgVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(PkgVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="$(PkgVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(PkgVersion)" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(PkgVersion)" />
+		<PackageReference Include="System.Net.Http.Json" Version="$(PkgVersion)" />
 	</ItemGroup>
 </Project>
