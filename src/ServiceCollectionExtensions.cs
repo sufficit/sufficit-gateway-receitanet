@@ -19,7 +19,7 @@ namespace Sufficit.Gateway.ReceitaNet
         {
             services.AddOptions<GatewayOptions>();
 
-            var provider = services.BuildServiceProvider();
+            var provider = services.BuildServiceProvider(false);
             var configuration = provider.GetRequiredService<IConfiguration>();
 
             // Definindo o local da configuração global

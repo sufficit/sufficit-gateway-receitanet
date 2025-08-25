@@ -2,9 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
 	<PropertyGroup Label="Sufficit Targeting">
 		<TargetFrameworks>netstandard2.0;net7.0;net9.0</TargetFrameworks>
-		<Nullable>enable</Nullable>
-		<LangVersion>8.0</LangVersion>
-		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>Sufficit.Gateway.ReceitaNet</RootNamespace>
 	</PropertyGroup>
 
@@ -59,13 +56,46 @@
 		</None>
 	</ItemGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
-		<PkgVersion>[*,9.0.0)</PkgVersion>
+	<!-- #region Sufficit Versioning Options V:202508251150 -->
+
+	<PropertyGroup Label="Sufficit Versioning Options" Condition="'$(TargetFramework)' == 'netstandard2.0'">
+		<PkgVersion>[9.*,10.0.0)</PkgVersion>
+		<PkgVersionUntil8>[*,10.0.0)</PkgVersionUntil8>
+		<NoWarn>$(NoWarn);nullable</NoWarn>
+
+		<!-- Set language version per framework to ensure compatibility with generated global usings -->
+		<LangVersion>9.0</LangVersion>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(PkgVersion)' == '' ">
-		<PkgVersion>[*,10.0.0)</PkgVersion>
+	<PropertyGroup Label="Sufficit Versioning Options" Condition=" '$(TargetFramework)' == 'net6.0' ">
+		<PkgVersion>[*,7.0.0)</PkgVersion>
+		<PkgVersionUntil8>[8.*,10.0.0)</PkgVersionUntil8>
+		<LangVersion>10.0</LangVersion>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
+
+	<PropertyGroup Label="Sufficit Versioning Options" Condition=" '$(TargetFramework)' == 'net7.0' ">
+		<PkgVersion>[*,8.0.0)</PkgVersion>
+		<PkgVersionUntil8>[8.*,10.0.0)</PkgVersionUntil8>
+		<LangVersion>10.0</LangVersion>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup Label="Sufficit Versioning Options" Condition=" '$(TargetFramework)' == 'net8.0' ">
+		<PkgVersion>[8.*,10.0.0)</PkgVersion>
+		<PkgVersionUntil8>[*,10.0.0)</PkgVersionUntil8>
+		<LangVersion>10.0</LangVersion>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup Label="Sufficit Versioning Options" Condition=" '$(TargetFramework)' == 'net9.0' ">
+		<PkgVersion>[9.*,10.0.0)</PkgVersion>
+		<PkgVersionUntil8>[*,10.0.0)</PkgVersionUntil8>
+		<LangVersion>10.0</LangVersion>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<!-- #endregion -->
 	
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="$(PkgVersion)" />
@@ -73,7 +103,8 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(PkgVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="$(PkgVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(PkgVersion)" />
-		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(PkgVersion)" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[*,9.0.0)" Condition=" '$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net7.0' OR '$(TargetFramework)' == 'net8.0'" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(PkgVersion)" Condition=" '$(TargetFramework)' == 'net9.0' OR '$(TargetFramework)' == 'netstandard2.0' " />
 		<PackageReference Include="System.Net.Http.Json" Version="$(PkgVersion)" />
 	</ItemGroup>
 </Project>
