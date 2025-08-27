@@ -103,8 +103,7 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(PkgVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="$(PkgVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(PkgVersion)" />
-		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="[*,9.0.0)" Condition=" '$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net7.0' OR '$(TargetFramework)' == 'net8.0'" />
-		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(PkgVersion)" Condition=" '$(TargetFramework)' == 'net9.0' OR '$(TargetFramework)' == 'netstandard2.0' " />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(PkgVersionUntil8)" />
 		<PackageReference Include="System.Net.Http.Json" Version="$(PkgVersion)" />
 	</ItemGroup>
 </Project>
