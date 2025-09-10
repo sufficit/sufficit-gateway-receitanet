@@ -103,7 +103,6 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(PkgVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="$(PkgVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(PkgVersion)" />
-		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(PkgVersionUntil8)" />
 		<PackageReference Include="System.Net.Http.Json" Version="$(PkgVersion)" />
 	</ItemGroup>
 </Project>
