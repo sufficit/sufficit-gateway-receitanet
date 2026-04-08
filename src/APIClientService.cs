@@ -22,6 +22,8 @@ namespace Sufficit.Gateway.ReceitaNet
 
         public Task<ContractResponse> GetContract(GetContractParameters parameters, string token, CancellationToken cancellationToken = default)
         {
+            Prepare(parameters);
+
             logger.LogTrace("get client by contract: {contract}, document: {document}, phone: {phone}", 
                 parameters.ContractId, 
                 parameters.Document,
@@ -29,7 +31,6 @@ namespace Sufficit.Gateway.ReceitaNet
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
-            query["app"] = APPLICATION;
 
             var uri = new Uri($"clientes?{query}", UriKind.Relative);
             var message = new HttpRequestMessage(HttpMethod.Post, uri);
@@ -39,13 +40,14 @@ namespace Sufficit.Gateway.ReceitaNet
 
         public Task<NotifyResponse> PaymentNotification(ContractAndContactParameters parameters, string token, CancellationToken cancellationToken = default)
         {
+            Prepare(parameters);
+
             logger.LogTrace("payment notification by contract: {contract}, contact: {contact}", 
                 parameters.ContractId, 
                 parameters.Contact);
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
-            query["app"] = APPLICATION;
 
             var uri = new Uri($"notificacao-pagamento?{query}", UriKind.Relative);
             var message = new HttpRequestMessage(HttpMethod.Post, uri);
@@ -55,6 +57,8 @@ namespace Sufficit.Gateway.ReceitaNet
 
         public Task<ChargeResponse> ChargeNotification(ChargeNotificationParameters parameters, string token, CancellationToken cancellationToken = default)
         {
+            Prepare(parameters);
+
             logger.LogTrace("charge notification by contract: {contract}, contact: {contact}, channel: {channel}", 
                 parameters.ContractId,
                 parameters.Contact,
@@ -62,7 +66,6 @@ namespace Sufficit.Gateway.ReceitaNet
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
-            query["app"] = APPLICATION;
 
             var uri = new Uri($"boletos?{query}", UriKind.Relative);
             var message = new HttpRequestMessage(HttpMethod.Post, uri);
@@ -72,13 +75,14 @@ namespace Sufficit.Gateway.ReceitaNet
 
         public async Task<ConnectionStatusResponse> GetConnectionStatus(ContractAndContactParameters parameters, string token, CancellationToken cancellationToken = default)
         {
+            Prepare(parameters);
+
             logger.LogTrace("get connection status by contract: {contract}, contact: {contact}", 
                 parameters.ContractId, 
                 parameters.Contact);
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
-            query["app"] = APPLICATION;
 
             var uri = new Uri($"verificar-acesso?{query}", UriKind.Relative);
             var message = new HttpRequestMessage(HttpMethod.Post, uri);
@@ -100,7 +104,7 @@ namespace Sufficit.Gateway.ReceitaNet
 
                     if (statuscode == 500)
                     {
-                        ex = new MissingServerConfigurationException(parameters.ContractId, ex);
+                        ex = new MissingServerConfigurationException(parameters.ContractId.GetValueOrDefault(), ex);
                         logger.LogWarning(ex, "error on getting connection status, {message}", ex.Message);
                     }
                     else
@@ -123,6 +127,8 @@ namespace Sufficit.Gateway.ReceitaNet
         /// </summary>
         public Task<TicketResponse> Ticket(TicketParameters parameters, string token, CancellationToken cancellationToken = default)
         {
+            Prepare(parameters);
+
             logger.LogTrace("open ticket by contract: {contract}, contact: {contact}, kind: {kind}, reason: {reason}", 
                 parameters.ContractId,
                 parameters.Contact,
@@ -131,7 +137,6 @@ namespace Sufficit.Gateway.ReceitaNet
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
-            query["app"] = APPLICATION;
 
             var uri = new Uri($"abertura-chamado?{query}", UriKind.Relative);
             var message = new HttpRequestMessage(HttpMethod.Post, uri);
@@ -144,6 +149,8 @@ namespace Sufficit.Gateway.ReceitaNet
         /// </summary>
         public Task<RecordingResponse> Recording(RecordingParameters parameters, string token, CancellationToken cancellationToken = default)
         {
+            Prepare(parameters);
+
             logger.LogTrace("update ticket recording by ticket: {ticket}, extension: {extension}, recording: {recording}, finalize: {finalize}", 
                 parameters.TicketId,
                 parameters.Extension,
@@ -152,12 +159,17 @@ namespace Sufficit.Gateway.ReceitaNet
 
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
             query["token"] = token;
-            query["app"] = APPLICATION;
 
             var uri = new Uri($"chamado-gravacao?{query}", UriKind.Relative);
             var message = new HttpRequestMessage(HttpMethod.Post, uri);
             message.Content = JsonContent.Create(parameters, null, jsonOptions);
             return Request<RecordingResponse>(message, cancellationToken);
+        }
+
+        private static T Prepare<T>(T parameters) where T : RequestParameters
+        {
+            parameters.Application ??= APPLICATION;
+            return parameters;
         }
     }
 }

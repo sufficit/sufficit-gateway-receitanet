@@ -13,6 +13,7 @@ namespace Sufficit.Gateway.ReceitaNet.Parameters
         public string Reason { get; set; } = default!;
 
         [JsonPropertyName("ocorrenciatipo")]
+        [JsonConverter(typeof(JsonIntEnumConverter<TicketEnum>))]
         public TicketEnum Kind { get; set; }
     }
 }

@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 
 namespace Sufficit.Gateway.ReceitaNet.Parameters
 {
-    public abstract class ContractIdParameters
+    public abstract class ContractIdParameters : RequestParameters
     {
         /// <summary>
         /// (optional) Contract id
         /// </summary>
         [JsonPropertyName("contrato")]
-        public int ContractId { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? ContractId { get; set; }
     }
 }

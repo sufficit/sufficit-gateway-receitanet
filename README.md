@@ -1,14 +1,120 @@
 <p align="center">
-	<img src="https://raw.githubusercontent.com/sufficit/sufficit-gateway-receitanet/main/icon.png" alt="ReceitaNet" width="100" />	
-	<p align="center">Projeto de integração com o software de gestão ReceitaNet (Provedores)</p>
+	<img src="https://raw.githubusercontent.com/sufficit/sufficit-gateway-receitanet/main/icon.png" alt="ReceitaNet" width="100" />
 </p>
-<hr />
 
-[![Chat with us on Telegram](https://telegram.org/favicon.ico)](https://t.me/sufficitti/2)
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://god.gw.postman.com/run-collection/5047984-6c764405-2488-449b-b385-6b29d49bc09b?action=collection%2Ffork&collection-url=entityId%3D5047984-6c764405-2488-449b-b385-6b29d49bc09b%26entityType%3Dcollection%26workspaceId%3Dbd72aaba-0c31-40ad-801c-d5ba19184aff#?env%5BReceitaNet%5D=W3sia2V5IjoidG9rZW4iLCJ2YWx1ZSI6IjVlODc2YmQ3LWQyNDItNGFlYy1hNzJjLWFiZWFhYjJmMjgxNyIsImVuYWJsZWQiOnRydWUsInNlc3Npb25WYWx1ZSI6IjVlODc2YmQ3LWQyNDItNGFlYy1hNzJjLWFiZWFhYjJmMjgxNyIsInNlc3Npb25JbmRleCI6MH0seyJrZXkiOiJiYXNldXJsIiwidmFsdWUiOiJodHRwczovL3Npc3RlbWEucmVjZWl0YW5ldC5uZXQvYXBpL25vdm8vdXJhIiwiZW5hYmxlZCI6dHJ1ZSwic2Vzc2lvblZhbHVlIjoiaHR0cHM6Ly9zaXN0ZW1hLnJlY2VpdGFuZXQubmV0L2FwaS9ub3ZvL3VyYSIsInNlc3Npb25JbmRleCI6MX0seyJrZXkiOiJjb250cmF0byIsInZhbHVlIjoiMTU2NzgiLCJlbmFibGVkIjp0cnVlLCJ0eXBlIjoiZGVmYXVsdCIsInNlc3Npb25WYWx1ZSI6IjE1Njc4Iiwic2Vzc2lvbkluZGV4IjoyfV0=)
+# Sufficit.Gateway.ReceitaNet
 
-**Links:**
-  * [Para relatar problemas no script ou sugestões](https://github.com/sufficit/sufficit-gateway-receitanet/issues)
-  * [ReceitaNet - API - URA (1.0.1)](https://www.receitanet.net/api/ura/)
-  
-  
+## About
+
+`Sufficit.Gateway.ReceitaNet` is a .NET client library for the official ReceitaNet URA API.
+It wraps the main provider operations used by Sufficit integrations, including customer lookup, connection status checks, billing notifications, payment notifications, ticket creation, and recording updates.
+
+The package keeps the ReceitaNet token explicit per request, because the external API expects the token in the query string instead of using Bearer authentication.
+
+## Features
+
+- Customer lookup by contract, phone, or CPF/CNPJ
+- Connection status queries
+- Billing notification by email or SMS
+- Payment notification requests
+- Ticket creation for support flows
+- Ticket recording update requests
+- Support for `contratos` returned as either a single object or an array
+- Request contract tests and optional live integration tests
+
+## Installation
+
+Add the NuGet package reference:
+
+```xml
+<PackageReference Include="Sufficit.Gateway.ReceitaNet" Version="*" />
+```
+
+Register the gateway in dependency injection:
+
+```csharp
+services.AddGatewayReceitaNet();
+```
+
+Configure the `ReceitaNet` section in your application settings:
+
+```json
+{
+	"ReceitaNet": {
+		"BaseUrl": "https://sistema.receitanet.net/api/novo/ura/",
+		"ClientId": "ReceitaNet",
+		"TimeOut": 30,
+		"Agent": "Sufficit C# API Client"
+	}
+}
+```
+
+## Usage
+
+Inject `APIClientService` and pass the provider token explicitly on each request:
+
+```csharp
+public class ReceitaNetProbe
+{
+		private readonly APIClientService _client;
+
+		public ReceitaNetProbe(APIClientService client)
+		{
+				_client = client;
+		}
+
+		public async Task<int?> FindContractByDocumentAsync(string token, string document, CancellationToken cancellationToken)
+		{
+				var response = await _client.GetContractByDocument(token, document, cancellationToken);
+				return response.Contract?.ClientId;
+		}
+}
+```
+
+Main operations exposed by the package:
+
+- `GetContract(...)`
+- `GetContractByPhone(...)`
+- `GetContractByDocument(...)`
+- `GetConnectionStatus(...)`
+- `ChargeNotification(...)`
+- `PaymentNotification(...)`
+- `Ticket(...)`
+- `Recording(...)`
+
+## Tests
+
+Tests live under `test/`.
+
+Run the full suite with:
+
+```bash
+dotnet test test/Sufficit.Gateway.ReceitaNet.IntegrationTests.csproj -c Release
+```
+
+The suite includes:
+
+- HTTP request contract tests for each ReceitaNet endpoint
+- `ContractResponse` deserialization tests for single-object and array payloads
+- Guardrail tests for `ProtectedApiQueryTokenHandler`
+- Optional live integration tests driven by `test/appsettings.json` or environment variables
+
+Mutating tests stay disabled by default through `ReceitaNet:AllowSideEffects = false`.
+Only enable them when you explicitly want to execute real notification, ticket, or recording operations.
+
+## License
+
+This repository is distributed under the license shipped in [license](license).
+
+## Support
+
+- Issues: https://github.com/sufficit/sufficit-gateway-receitanet/issues
+- Telegram: https://t.me/sufficitti/2
+
+## Related
+
+- Official ReceitaNet API documentation: https://www.receitanet.net/api/ura/
+- Official ReceitaNet OpenAPI: https://www.receitanet.net/api/ura/openapi.yaml
+- Repository: https://github.com/sufficit/sufficit-gateway-receitanet
+
+

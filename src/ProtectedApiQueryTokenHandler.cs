@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,11 +11,10 @@ namespace Sufficit.Gateway.ReceitaNet
         {
             if (ShouldAuthenticate(request)) 
             {
-                if (!request.RequestUri?.Query.Contains("token") ?? true)
+                var query = System.Web.HttpUtility.ParseQueryString(request.RequestUri?.Query ?? string.Empty);
+                var token = query["token"];
+                if (string.IsNullOrWhiteSpace(token))
                     throw new Exception("missing token");
-
-                if (!request.RequestUri?.Query.Contains("app") ?? true)
-                    throw new Exception("missing app");
             }
 
             // Proceed calling the inner handler, that will actually send the request

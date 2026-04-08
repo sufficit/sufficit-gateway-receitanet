@@ -85,4 +85,24 @@ namespace Sufficit.Gateway.ReceitaNet
             writer.WriteStringValue(value);            
         }
     }
+
+    public class JsonIntEnumConverter<TEnum> : JsonConverter<TEnum>
+        where TEnum : struct, Enum
+    {
+        public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return reader.TokenType switch
+            {
+                JsonTokenType.Number => (TEnum)Enum.ToObject(typeof(TEnum), reader.GetInt32()),
+                JsonTokenType.String when int.TryParse(reader.GetString(), out var value) => (TEnum)Enum.ToObject(typeof(TEnum), value),
+                JsonTokenType.String when Enum.TryParse<TEnum>(reader.GetString(), true, out var parsed) => parsed,
+                _ => throw new JsonException($"Unable to parse {typeof(TEnum).Name} from token {reader.TokenType}.")
+            };
+        }
+
+        public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
+        {
+            writer.WriteNumberValue(Convert.ToInt32(value));
+        }
+    }
 }

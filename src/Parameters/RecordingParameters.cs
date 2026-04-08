@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Sufficit.Gateway.ReceitaNet.Parameters
 {
-    public class RecordingParameters 
+    public class RecordingParameters : RequestParameters
     {
         [JsonPropertyName("idSuporte")]
         public int TicketId { get; set; } = default!;
