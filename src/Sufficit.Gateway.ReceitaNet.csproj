@@ -105,4 +105,8 @@
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(PkgVersion)" />
 		<PackageReference Include="System.Net.Http.Json" Version="$(PkgVersion)" />
 	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 </Project>
