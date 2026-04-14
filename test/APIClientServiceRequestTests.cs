@@ -1,3 +1,5 @@
+using System.Net;
+using System.Text;
 using System.Text.Json;
 using Sufficit.Gateway.ReceitaNet.Parameters;
 
@@ -45,6 +47,67 @@ public class APIClientServiceRequestTests
         Assert.Equal(APIClientService.APPLICATION, body.RootElement.GetProperty("app").GetString());
         Assert.Equal(321, body.RootElement.GetProperty("contrato").GetInt32());
         Assert.Equal("21999999999", body.RootElement.GetProperty("uracontato").GetString());
+    }
+
+    [Fact]
+    public async Task GetConnectionStatus_ReturnsContractNotFoundWithoutReadingBodyOn404()
+    {
+        var content = new TrackingHttpContent();
+        var handler = new RecordingHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.NotFound)
+        {
+            Content = content
+        });
+        var client = ReceitaNetTestClientFactory.Create(new StaticHttpClientFactory(() => new HttpClient(handler, false)));
+
+        var response = await client.GetConnectionStatus(new ContractAndContactParameters()
+        {
+            ContractId = 321,
+            Contact = "21999999999"
+        }, "token-123");
+
+        Assert.False(response.Success);
+        Assert.Equal("contract not found", response.Message);
+        Assert.NotNull(response.Exception);
+        Assert.Equal("contract not found", response.Exception!.Message);
+        Assert.False(content.WasRead);
+    }
+
+    [Fact]
+    public async Task GetConnectionStatus_PreservesHtmlErrorPageWhenUpstreamReturnsHtml()
+    {
+        const string html = """
+<!DOCTYPE html>
+<html>
+<body>
+    <div class=\"error-page\">
+        <h2 class=\"headline text-yellow\">500</h2>
+        <div class=\"error-content\">
+            <h3><i class=\"fa fa-warning text-yellow\"></i> Oops! Erro Interno do Servidor</h3>
+            <p>O servidor encontrou uma condição inesperada.</p>
+        </div>
+    </div>
+</body>
+</html>
+""";
+
+        var handler = new RecordingHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.InternalServerError)
+        {
+            Content = new StringContent(html, Encoding.UTF8, "text/html")
+        });
+        var client = ReceitaNetTestClientFactory.Create(new StaticHttpClientFactory(() => new HttpClient(handler, false)));
+
+        var response = await client.GetConnectionStatus(new ContractAndContactParameters()
+        {
+            ContractId = 321,
+            Contact = "21999999999"
+        }, "token-123");
+
+        Assert.False(response.Success);
+        Assert.Equal(html.Trim(), response.Message);
+        Assert.NotNull(response.Exception);
+        Assert.Equal(response.Message, response.Exception!.Message);
+        Assert.DoesNotContain("error parsing response", response.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("<html", response.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

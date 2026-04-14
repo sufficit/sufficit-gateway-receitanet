@@ -1,0 +1,506 @@
+openapi: 3.0.3
+servers:
+  - url: https://sistema.receitanet.net/api/novo/ura
+
+info:
+  version: 1.1.0
+  title: "ReceitaNet - API - URA"
+  description: "API para uso em sistema de URA. A Documentação poderá ser testada com o Token 5e876bd7-d242-4aec-a72c-abeaab2f2817"
+  contact:
+    name: "Leandro"
+    url: "https://sistema.receitanet.net/api/novo/ura"
+    email: "leandro@receitanet.net"
+  license:
+    name: Private
+  x-logo:
+    url: 'https://www.receitanet.net/assets/images/receitanet-banner.png'
+    backgroundColor: '#FFFFFF'
+    altText: ReceitaNet
+
+tags:
+  - name: Clientes
+    description: "Informações Cadastral do Cliente"
+  - name: OrdemServico
+    description: "Ordem de Serviço"
+
+paths:
+  /clientes:
+    get:
+      operationId: "clientes-get"
+      summary: "Listagem de contratos"
+      description: "Retorna um ou vários contratos associados ao cliente."
+      tags:
+        - Clientes
+      responses:
+        "200":
+          description: "Contratos localizados"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  msg:
+                    type: string
+                    description: "Mensagem retornada"
+                    example: "Contratos Localizado"
+                  contratos:
+                    description: "Retorna um único contrato ou uma lista de contratos"
+                    oneOf:
+                      - $ref: "#/components/schemas/Cliente"
+                      - type: array
+                        items:
+                          $ref: "#/components/schemas/Cliente"
+                required:
+                  - success
+                  - msg
+                  - contratos
+
+        "401":
+          description: "Não Autenticado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotAuthenticated"
+
+        "404":
+          description: "Cliente não localizado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorRequest"
+    post:
+      operationId: "clientes-post"
+      summary: "Busca de Clientes usando Contrato, Telefone ou CPF/CNPJ"
+      description: "Busca de Clientes usando Contrato, Telefone ou CPF/CNPJ"
+      tags:
+        - Clientes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app:
+                  type: string
+                  example: ura
+
+                contrato:
+                  type: integer
+                  nullable: true
+                  description: "Opcional — informe somente para busca por contrato"
+                  example: 1234
+
+                phone:
+                  type: string
+                  nullable: true
+                  description: "Opcional — informe somente para busca por telefone"
+                  example: "(21)96712-2381"
+
+                cpfcnpj:
+                  type: string
+                  nullable: true
+                  description: "Opcional — informe somente para busca por CPF/CNPJ"
+                  example: "19182374929"
+              required:
+                - app
+
+      responses:
+        "200":
+          description: "Informações do Cliente"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  msg:
+                    type: string
+                    example: "Contrato Localizado"
+                  contratos:
+                    description: "Um único contrato ou uma lista de contratos"
+                    oneOf:
+                      - $ref: "#/components/schemas/Cliente"
+                      - type: array
+                        items:
+                          $ref: "#/components/schemas/Cliente"
+        "401":
+          description: "Não Autenticado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotAuthenticated"
+
+        "404":
+          description: "Cliente não localizado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorRequest"
+  /boletos:
+    post:
+      operationId: "boletos-post"
+      summary: "Enviar SMS/EMAIL de um boleto para o Cliente"
+      description: "Enviar SMS/EMAIL de um boleto para o Cliente"
+      tags:
+        - Clientes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app:
+                  type: string
+                  example: ura
+                tipo:
+                  type: string
+                  enum: [email, sms]
+                  example: email
+                contrato:
+                  type: integer
+                  example: 15678
+                uracontato:
+                  type: string
+                  example: "18999998888"
+              required: [app, tipo, contrato, uracontato]
+
+      responses:
+        "200":
+          description: "Sucesso no envio"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessRequest"
+                  - type: object
+                    properties:
+                      msg:
+                        example: "Fatura enviada com sucesso"
+                  - $ref: "#/components/schemas/Boleto"
+
+        "400":
+          description: "Nenhum boleto localizado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorRequest"
+
+        "401":
+          description: "Não Autenticado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotAuthenticated"
+
+        "404":
+          description: "Cliente não localizado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorRequest"
+
+
+  ###############################################################
+  # /verificar-acesso
+  ###############################################################
+  /verificar-acesso:
+    post:
+      operationId: "verificar-acesso-post"
+      summary: "Verificar se o Cliente está ONLINE ou OFFLINE"
+      description: "Verificar se o Cliente está ONLINE ou OFFLINE"
+      tags:
+        - Clientes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app: { type: string }
+                contrato: { type: integer }
+                uracontato: { type: string }
+              required: [app, contrato, uracontato]
+
+      responses:
+        "200":
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessRequest"
+                  - $ref: "#/components/schemas/VerificarAcesso"
+
+        "401":
+          description: "Autenticação incorreta"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotAuthenticated"
+
+        "404":
+          description: "Contrato não localizado."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorRequest"
+  /notificacao-pagamento:
+    post:
+      operationId: "notificacao-pagamento-post"
+      summary: "Notificação de Pagamento"
+      description: "Notificação de Pagamento"
+      tags:
+        - Clientes
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app: { type: string }
+                contrato: { type: integer }
+                uracontato: { type: string }
+              required: [app, contrato, uracontato]
+
+      responses:
+        "200":
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessRequest"
+                  - $ref: "#/components/schemas/NotificacaoPagamento"
+
+        "401":
+          description: "Autenticação incorreta"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotAuthenticated"
+
+        "404":
+          description: "Contrato não localizado."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorRequest"
+  /abertura-chamado:
+    post:
+      operationId: "abertura-chamado-post"
+      summary: "Abertura de Chamado"
+      description: "Abertura de Chamado"
+      tags:
+        - OrdemServico
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app: { type: string }
+                contrato: { type: integer }
+                uracontato: { type: string }
+                motivoos: { type: string }
+                ocorrenciatipo:
+                  type: integer
+                  enum: [1, 2, 4, 5]
+              required: [app, contrato, uracontato, motivoos, ocorrenciatipo]
+      responses:
+        "200":
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessRequest"
+                  - $ref: "#/components/schemas/AberturaOS"
+        "401":
+          description: "Autenticação incorreta"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotAuthenticated"
+        "404":
+          description: "Contrato não localizado."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorRequest"
+  /chamado-gravacao:
+    post:
+      operationId: "chamado-gravacao-post"
+      summary: "Gravação de Chamado"
+      description: "Gravação de Chamado"
+      tags:
+        - OrdemServico
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app: { type: string }
+                isSuporte: { type: integer }
+                urlgravacao: { type: string }
+                ramal: { type: integer }
+                is_finalizar: { type: boolean }
+              required: [app, urlgravacao, ramal, is_finalizar]
+      responses:
+        "200":
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessRequest"
+                  - $ref: "#/components/schemas/GravacaoOS"
+        "401":
+          description: "Autenticação incorreta"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotAuthenticated"
+        "404":
+          description: "Contrato não localizado."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorRequest"
+
+components:
+  schemas:
+    Cliente:
+      type: object
+      properties:
+        idCliente: { type: integer }
+        razaoSocial: { type: string }
+        contratoStatusDisplay:
+          type: string
+          enum: ["Ativo", "Suspenso"]
+        isPromessaPagamento: { type: boolean }
+        contratoValorAberto: { type: number }
+        faturasEmAberto:
+          type: array
+          items:
+            $ref: "#/components/schemas/Fatura"
+        cpfCnpj: { type: string }
+        contratoStatus:
+          type: integer
+          enum: [1, 3, 4]
+        existeChamado: { type: integer }
+        contratoId: { type: integer }
+        isEmail: { type: boolean }
+        isSMS: { type: boolean }
+        isChamados:
+          type: object
+          properties:
+            "1": { type: integer }
+            "2": { type: integer }
+            "4": { type: integer }
+            "5": { type: integer }
+        tecnologia: { type: integer }
+        servidor:
+          type: object
+          properties:
+            isManutencao: { type: boolean }
+            mensagemManutencao:
+              oneOf:
+                - type: string
+                - type: boolean
+
+    Fatura:
+      type: object
+      properties:
+        valor: { type: number }
+        vencimento: { type: string }
+
+    Boleto:
+      type: object
+      properties:
+        idCliente: { type: integer }
+        razaoSocial: { type: string }
+        cpfCnpj: { type: string }
+        uracontato: { type: string }
+        protocolo: { type: string }
+        status: { type: boolean }
+        contratoId: { type: integer }
+
+    VerificarAcesso:
+      type: object
+      properties:
+        idCliente: { type: integer }
+        razaoSocial: { type: string }
+        cpfCnpj: { type: string }
+        uracontato: { type: string }
+        status:
+          type: integer
+          enum: [1, 2]
+        contratoId: { type: integer }
+
+    NotificacaoPagamento:
+      type: object
+      properties:
+        idCliente: { type: integer }
+        liberado: { type: boolean }
+        razaoSocial: { type: string }
+        cpfCnpj: { type: string }
+        uracontato: { type: string }
+        protocolo: { type: string }
+        status:
+          type: integer
+          enum: [1, 2]
+        contratoId: { type: integer }
+
+    AberturaOS:
+      type: object
+      properties:
+        idCliente: { type: integer }
+        idSuporte: { type: integer }
+        razaoSocial: { type: string }
+        cpfCnpj: { type: string }
+        uracontato: { type: string }
+        protocolo: { type: string }
+        status: { type: boolean }
+        contratoId: { type: integer }
+
+    GravacaoOS:
+      type: object
+      properties:
+        idCliente: { type: integer }
+        status: { type: boolean }
+
+    NotAuthenticated:
+      type: object
+      properties:
+        error:
+          type: string
+          default: "unauthorized_client"
+
+    SuccessRequest:
+      type: object
+      properties:
+        success: { type: boolean }
+        msg: { type: string }
+
+    ErrorRequest:
+      type: object
+      properties:
+        success: { type: boolean }
+        msg: { type: string }
+
+  securitySchemes:
+    TokenAuth:
+      type: apiKey
+      name: token
+      in: query
+
+security:
+  - TokenAuth: []

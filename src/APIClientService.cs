@@ -13,6 +13,7 @@ namespace Sufficit.Gateway.ReceitaNet
     public class APIClientService : ControllerSection
     {
         public const string APPLICATION = "ura";
+        private const string ContractNotFoundMessage = "contract not found";
 
         public APIClientService(IOptionsMonitor<GatewayOptions> ioptions, IHttpClientFactory clientFactory, ILogger<APIClientService> logger)
             : base(ioptions, clientFactory, logger, Json.Options)
@@ -87,9 +88,21 @@ namespace Sufficit.Gateway.ReceitaNet
             var uri = new Uri($"verificar-acesso?{query}", UriKind.Relative);
             var message = new HttpRequestMessage(HttpMethod.Post, uri);
             message.Content = JsonContent.Create(parameters, null, jsonOptions);
+
+            ConnectionStatusResponse? result = null;
             try
             {
-                return await Request<ConnectionStatusResponse>(message, cancellationToken);
+                result = await Request<ConnectionStatusResponse>(message, cancellationToken, readNotFoundBody: false, notFoundMessage: ContractNotFoundMessage);
+                if (!result.Success && !string.IsNullOrWhiteSpace(result.Message))
+                {
+                    result.Exception = result.Exception == null
+                        ? new Exception(result.Message)
+                        : new Exception(result.Message, result.Exception);
+
+                    logger.LogWarning(result.Exception, "receitanet connection status for contract {contract}: {message}", parameters.ContractId, result.Message);
+                }
+
+                return result;
             }
             catch (Exception ex) 
             {
@@ -116,7 +129,7 @@ namespace Sufficit.Gateway.ReceitaNet
                 return new ConnectionStatusResponse()
                 {
                     Success = false,
-                    Message = ex.Message,
+                    Message = result?.Message,
                     Exception = ex
                 };
             }
