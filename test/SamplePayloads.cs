@@ -106,6 +106,13 @@ internal static class SamplePayloads
     }
     """;
 
+    public const string ChargeNotFound = """
+    {
+      "success": false,
+      "msg": "Nenhum boleto pendente localizado"
+    }
+    """;
+
     public const string Ticket = """
     {
       "success": true,

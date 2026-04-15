@@ -135,6 +135,28 @@ public class APIClientServiceRequestTests
     }
 
     [Fact]
+    public async Task ChargeNotification_ReturnsStructuredErrorWhenUpstreamReturnsBadRequest()
+    {
+        var handler = new RecordingHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.BadRequest)
+        {
+            Content = new StringContent(SamplePayloads.ChargeNotFound, Encoding.UTF8, "application/json")
+        });
+        var client = ReceitaNetTestClientFactory.Create(new StaticHttpClientFactory(() => new HttpClient(handler, false)));
+
+        var response = await client.ChargeNotification(new ChargeNotificationParameters()
+        {
+            ContractId = 321,
+            Contact = "21999999999",
+            Channel = NotificationChannel.email
+        }, "token-123");
+
+        Assert.False(response.Success);
+        Assert.False(response.Status);
+        Assert.Equal("Nenhum boleto pendente localizado", response.Message);
+        Assert.Null(response.Exception);
+    }
+
+    [Fact]
     public async Task PaymentNotification_SendsApplicationAndDoesNotUseQueryApp()
     {
         var handler = new RecordingHttpMessageHandler(_ => RecordingHttpMessageHandler.Json(SamplePayloads.NotifyAllowed));

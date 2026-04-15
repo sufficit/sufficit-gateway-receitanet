@@ -71,7 +71,7 @@ namespace Sufficit.Gateway.ReceitaNet
             var uri = new Uri($"boletos?{query}", UriKind.Relative);
             var message = new HttpRequestMessage(HttpMethod.Post, uri);
             message.Content = JsonContent.Create(parameters, null, jsonOptions);
-            return Request<ChargeResponse>(message, cancellationToken);
+            return Request<ChargeResponse>(message, cancellationToken, readBadRequestBody: true, badRequestMessage: "bad request");
         }
 
         public async Task<ConnectionStatusResponse> GetConnectionStatus(ContractAndContactParameters parameters, string token, CancellationToken cancellationToken = default)

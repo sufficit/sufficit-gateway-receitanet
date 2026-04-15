@@ -55,7 +55,7 @@ namespace Sufficit.Gateway.ReceitaNet
             return await response.Content.ReadFromJsonAsync<IEnumerable<T>>(jsonOptions, cancellationToken) ?? Array.Empty<T>();
         }
 
-        protected async Task<T> Request<T>(HttpRequestMessage message, CancellationToken cancellationToken, bool readNotFoundBody = true, string? notFoundMessage = null) where T : Response, new()
+        protected async Task<T> Request<T>(HttpRequestMessage message, CancellationToken cancellationToken, bool readNotFoundBody = true, string? notFoundMessage = null, bool readBadRequestBody = false, string? badRequestMessage = null) where T : Response, new()
         {
             using var response = await httpClient.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -67,6 +67,14 @@ namespace Sufficit.Gateway.ReceitaNet
                 }
 
                 return new T() { Success = false, Message = notFoundMessage ?? "not found" };
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest && readBadRequestBody)
+            {
+                var badRequestBody = await TryReadResponse<T>(response, cancellationToken);
+                if (badRequestBody != null) return badRequestBody;
+
+                return new T() { Success = false, Message = badRequestMessage ?? "bad request" };
             }
 
             if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
