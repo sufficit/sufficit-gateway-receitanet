@@ -66,10 +66,14 @@ public class ReceitaNetProbe
 		public async Task<int?> FindContractByDocumentAsync(string token, string document, CancellationToken cancellationToken)
 		{
 				var response = await _client.GetContractByDocument(token, document, cancellationToken);
-				return response.Contract?.ClientId;
+				return response.Contract?.EffectiveContractId;
 		}
 }
 ```
+
+The official ReceitaNet payload currently exposes both `idCliente` and `contratoId` in lookup responses.
+Use `ContractId` or `EffectiveContractId` for follow-up contract-scoped operations such as status, notifications, and ticket creation.
+`EffectiveContractId` falls back to `ClientId` only to preserve compatibility with older payloads that omit `contratoId`.
 
 Main operations exposed by the package:
 

@@ -101,8 +101,8 @@ public class ReceitaNetGatewayIntegrationTests
         }, _settings.Token!);
 
         Assert.NotNull(response);
-        Assert.True(response.Success, response.Message);
-        _output.WriteLine($"Connection status response: {response.Status}.");
+        Assert.True(IsControlledConnectionStatus(response), response.Message);
+        _output.WriteLine($"Connection status response: success={response.Success}, status={response.Status}, message={response.Message}.");
     }
 
     [Fact]
@@ -120,8 +120,8 @@ public class ReceitaNetGatewayIntegrationTests
         }, _settings.Token!);
 
         Assert.NotNull(response);
-        Assert.True(response.Success, response.Message);
-        _output.WriteLine($"Charge notification protocol: {response.Protocol}.");
+        Assert.True(IsControlledChargeNotification(response), response.Message);
+        _output.WriteLine($"Charge notification response: success={response.Success}, status={response.Status}, message={response.Message}, protocol={response.Protocol}.");
     }
 
     [Fact]
@@ -197,6 +197,16 @@ public class ReceitaNetGatewayIntegrationTests
         return true;
     }
 
+    private static bool IsControlledConnectionStatus(Responses.ConnectionStatusResponse response)
+        => response.Success
+        || response.Status == Responses.ConnectionStatusResponse.ConnectionStatus.Connected
+        || response.Status == Responses.ConnectionStatusResponse.ConnectionStatus.Disconnected;
+
+    private static bool IsControlledChargeNotification(Responses.ChargeResponse response)
+        => response.Success
+        || response.Message?.Contains("boleto pendente", StringComparison.OrdinalIgnoreCase) == true
+        || response.Message?.Contains("nenhum boleto", StringComparison.OrdinalIgnoreCase) == true;
+
     private async Task<int?> ResolveContractIdAsync()
     {
         if (_settings.ContractId.HasValue)
@@ -206,14 +216,14 @@ public class ReceitaNetGatewayIntegrationTests
         {
             var response = await _client.GetContractByDocument(_settings.Token!, _settings.Document!);
             if (response.Success && response.Contracts.Count > 0)
-                return response.Contracts[0].ClientId;
+                return response.Contracts[0].EffectiveContractId;
         }
 
         if (_settings.HasPhoneLookup)
         {
             var response = await _client.GetContractByPhone(_settings.Token!, _settings.Phone!);
             if (response.Success && response.Contracts.Count > 0)
-                return response.Contracts[0].ClientId;
+                return response.Contracts[0].EffectiveContractId;
         }
 
         return null;

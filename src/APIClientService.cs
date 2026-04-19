@@ -95,11 +95,18 @@ namespace Sufficit.Gateway.ReceitaNet
                 result = await Request<ConnectionStatusResponse>(message, cancellationToken, readNotFoundBody: false, notFoundMessage: ContractNotFoundMessage);
                 if (!result.Success && !string.IsNullOrWhiteSpace(result.Message))
                 {
-                    result.Exception = result.Exception == null
-                        ? new Exception(result.Message)
-                        : new Exception(result.Message, result.Exception);
+                    if (LooksLikeControlledConnectionStatus(result))
+                    {
+                        logger.LogInformation("receitanet connection status for contract {contract}: {message}", parameters.ContractId, result.Message);
+                    }
+                    else
+                    {
+                        result.Exception = result.Exception == null
+                            ? new Exception(result.Message)
+                            : new Exception(result.Message, result.Exception);
 
-                    logger.LogWarning(result.Exception, "receitanet connection status for contract {contract}: {message}", parameters.ContractId, result.Message);
+                        logger.LogWarning(result.Exception, "receitanet connection status for contract {contract}: {message}", parameters.ContractId, result.Message);
+                    }
                 }
 
                 return result;
@@ -133,6 +140,17 @@ namespace Sufficit.Gateway.ReceitaNet
                     Exception = ex
                 };
             }
+        }
+
+        private static bool LooksLikeControlledConnectionStatus(ConnectionStatusResponse? response)
+        {
+            if (response == null)
+                return false;
+
+            return response.Status != ConnectionStatusResponse.ConnectionStatus.Unknown
+                || response.ClientId > 0
+                || response.EffectiveContractId > 0
+                || !string.IsNullOrWhiteSpace(response.Title);
         }
 
         /// <summary>

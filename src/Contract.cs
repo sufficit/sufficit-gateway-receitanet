@@ -10,10 +10,24 @@ namespace Sufficit.Gateway.ReceitaNet
     public class Contract
     {
         /// <summary>
-        /// (required) código do cliente
+        /// Official ReceitaNet customer identifier.
         /// </summary>
         [JsonPropertyName("idCliente")]
         public int ClientId { get; set; }
+
+        /// <summary>
+        /// Official ReceitaNet contract identifier used by contract-scoped operations.
+        /// </summary>
+        [JsonPropertyName("contratoId")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? ContractId { get; set; }
+
+        /// <summary>
+        /// Uses the official contract identifier when available and falls back to the customer identifier only for legacy payload compatibility.
+        /// </summary>
+        [JsonIgnore]
+        public int EffectiveContractId
+            => ContractId.HasValue && ContractId.Value > 0 ? ContractId.Value : ClientId;
 
         /// <summary>
         /// (required) nome do cliente

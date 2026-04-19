@@ -8,6 +8,30 @@ internal static class SamplePayloads
       "msg": "ok",
       "contratos": {
         "idCliente": 123,
+        "contratoId": 123,
+        "razaoSocial": "Cliente Teste",
+        "contratoStatusDisplay": "Ativo",
+        "isPromessaPagamento": false,
+        "contratoValorAberto": 0,
+        "faturasEmAberto": [],
+        "cpfCnpj": "12345678901",
+        "contratoStatus": 1,
+        "existeChamado": 0,
+        "isChamados": { "1": 0, "2": 0, "4": 0, "5": 0 },
+        "isEmail": true,
+        "isSMS": true,
+        "tecnologia": 1,
+        "servidor": { "isManutencao": false, "mensagemManutencao": false }
+      }
+    }
+    """;
+
+    public const string ContractSingleLegacyWithoutContractId = """
+    {
+      "success": true,
+      "msg": "ok",
+      "contratos": {
+        "idCliente": 123,
         "razaoSocial": "Cliente Teste",
         "contratoStatusDisplay": "Ativo",
         "isPromessaPagamento": false,
@@ -32,6 +56,7 @@ internal static class SamplePayloads
       "contratos": [
         {
           "idCliente": 123,
+          "contratoId": 123,
           "razaoSocial": "Cliente A",
           "contratoStatusDisplay": "Ativo",
           "isPromessaPagamento": false,
@@ -47,6 +72,7 @@ internal static class SamplePayloads
         },
         {
           "idCliente": 456,
+          "contratoId": 456,
           "razaoSocial": "Cliente B",
           "contratoStatusDisplay": "Suspenso",
           "isPromessaPagamento": true,
