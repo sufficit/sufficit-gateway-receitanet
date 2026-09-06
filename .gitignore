@@ -3,3 +3,5 @@
 **/obj/
 **/obj/**
 **/.vs/
+# Worktrees (padrao): arvores de trabalho em <repo>/.worktrees/
+**/.worktrees/
